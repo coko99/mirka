@@ -6,7 +6,8 @@ import { Marquee } from "@/components/Marquee";
 import { ProductCard } from "@/components/ProductCard";
 import { getDictionary } from "@/lib/dictionary";
 import { isLocale, localizedHref } from "@/lib/i18n";
-import { colorFilters, featuredProducts, products } from "@/lib/products";
+import { listVisibleProducts } from "@/lib/catalog";
+import { colorFilters, featuredFrom } from "@/lib/products";
 
 const lightColors = new Set(["zuta", "bez", "bela"]);
 
@@ -19,6 +20,8 @@ export default async function HomePage({
   if (!isLocale(lang)) notFound();
 
   const dict = getDictionary(lang);
+  const products = await listVisibleProducts();
+  const featuredProducts = featuredFrom(products);
   const lookbook = featuredProducts.slice(0, 3);
   const [brandLine1, brandLine2] = dict.home.brandTitle.split("\n");
 

@@ -4,10 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useI18n } from "@/components/LocaleProvider";
-import { featuredProducts, productName } from "@/lib/products";
+import { useCatalog } from "@/components/CatalogProvider";
+import { featuredFrom, productName } from "@/lib/products";
 
 export function HeroSlider() {
   const { locale, dict, href } = useI18n();
+  const featuredProducts = featuredFrom(useCatalog());
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
 

@@ -5,11 +5,12 @@ import { notFound } from "next/navigation";
 import { ProductActions } from "@/components/ProductActions";
 import { getDictionary } from "@/lib/dictionary";
 import { isLocale, localizedHref, locales } from "@/lib/i18n";
-import { getProduct, productName, products } from "@/lib/products";
+import { getVisibleProduct, listVisibleProducts } from "@/lib/catalog";
+import { productName, products as fallbackProducts } from "@/lib/products";
 
 export function generateStaticParams() {
   return locales.flatMap((lang) =>
-    products.map((product) => ({ lang, slug: product.slug })),
+    fallbackProducts.map((product) => ({ lang, slug: product.slug })),
   );
 }
 
@@ -19,7 +20,7 @@ export async function generateMetadata({
   params: Promise<{ lang: string; slug: string }>;
 }): Promise<Metadata> {
   const { lang, slug } = await params;
-  const product = getProduct(slug);
+  const product = await getVisibleProduct(slug);
   if (!product || !isLocale(lang)) return { title: "MIRKA" };
   const dict = getDictionary(lang);
   return {
@@ -35,7 +36,10 @@ export default async function ProductPage({
 }) {
   const { lang, slug } = await params;
   if (!isLocale(lang)) notFound();
-  const product = getProduct(slug);
+  const [product, products] = await Promise.all([
+    getVisibleProduct(slug),
+    listVisibleProducts(),
+  ]);
   if (!product) notFound();
 
   const dict = getDictionary(lang);

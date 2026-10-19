@@ -4,7 +4,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary } from "@/lib/dictionary";
 import { isLocale, localizedHref } from "@/lib/i18n";
-import { featuredProducts } from "@/lib/products";
+import { listVisibleProducts } from "@/lib/catalog";
+import { featuredFrom } from "@/lib/products";
 import { site } from "@/lib/site";
 
 export async function generateMetadata({
@@ -29,6 +30,7 @@ export default async function AboutPage({
   const { lang } = await params;
   if (!isLocale(lang)) notFound();
   const dict = getDictionary(lang);
+  const featuredProducts = featuredFrom(await listVisibleProducts());
   const [title1, title2] = dict.about.title.split("\n");
 
   return (

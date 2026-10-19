@@ -3,10 +3,11 @@
 import { useMemo, useState } from "react";
 import { ProductCard } from "@/components/ProductCard";
 import { useI18n } from "@/components/LocaleProvider";
+import { useCatalog } from "@/components/CatalogProvider";
 import {
   categories,
   colorFilters,
-  featuredProducts,
+  featuredFrom,
   filterProducts,
   priceFilters,
   type Category,
@@ -26,6 +27,7 @@ export function ProductGrid({
   initialPrice?: PriceId | "sve";
 }) {
   const { dict } = useI18n();
+  const products = useCatalog();
   const [active, setActive] = useState<Category | "sve">(initialCategory);
   const [color, setColor] = useState<ColorId | "sve">(initialColor);
   const [price, setPrice] = useState<PriceId | "sve">(initialPrice);
@@ -37,10 +39,10 @@ export function ProductGrid({
       color === "sve" &&
       price === "sve"
     ) {
-      return featuredProducts;
+      return featuredFrom(products);
     }
-    return filterProducts(active, color, price);
-  }, [active, color, mode, price]);
+    return filterProducts(active, color, price, products);
+  }, [active, color, mode, price, products]);
 
   return (
     <div>

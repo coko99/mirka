@@ -33,6 +33,11 @@ export default async function AdminOrderPage({
     `Narudžbina ${order.id}`,
     order.buyer.name,
     order.buyer.phone,
+    order.buyer.email,
+    order.shippingLabel,
+    order.buyer.address
+      ? `${order.buyer.address}, ${order.buyer.postal} ${order.buyer.city}`
+      : "",
     ...order.items.map((item) => `${item.qty}× ${item.name}`),
     order.totalLabel,
   ].join("\n");
@@ -50,6 +55,15 @@ export default async function AdminOrderPage({
           <h2 className="font-serif text-2xl">Kupac</h2>
           <p className="mt-3">{order.buyer.name}</p>
           <p className="text-sm">{order.buyer.phone}</p>
+          {order.buyer.email ? (
+            <p className="text-sm">{order.buyer.email}</p>
+          ) : null}
+          <p className="mt-4 text-sm leading-relaxed">{order.shippingLabel}</p>
+          {order.buyer.address ? (
+            <p className="mt-2 text-sm text-ink/70">
+              {order.buyer.address}, {order.buyer.postal} {order.buyer.city}
+            </p>
+          ) : null}
           {order.buyer.note ? (
             <p className="mt-3 text-sm text-ink/70">{order.buyer.note}</p>
           ) : null}

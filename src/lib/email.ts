@@ -7,9 +7,15 @@ function orderEmail() {
 }
 
 function fromAddress() {
-  return (
-    process.env.RESEND_FROM || "MIRKA with love <beth.t@example.com>"
-  );
+  const configured = process.env.RESEND_FROM?.trim();
+  if (
+    configured &&
+    configured.includes("@") &&
+    !/@example\.com\b/i.test(configured)
+  ) {
+    return configured;
+  }
+  return "MIRKA with love <beth.t@example.com>";
 }
 
 function formatWhen(value: string) {
@@ -37,6 +43,11 @@ function orderText(order: Order) {
     "",
     `Ime: ${order.buyer.name}`,
     `Telefon: ${order.buyer.phone}`,
+    order.buyer.email ? `Email: ${order.buyer.email}` : "",
+    `Dostava: ${order.shippingLabel}`,
+    order.buyer.address
+      ? `Adresa: ${order.buyer.address}, ${order.buyer.postal} ${order.buyer.city}`
+      : "",
     order.buyer.note ? `Napomena: ${order.buyer.note}` : "",
     "",
     "Stavke:",
@@ -78,6 +89,13 @@ function orderHtml(order: Order) {
       <div style="margin:28px 0;padding:20px;background:#fff;">
         <p style="margin:0 0 6px;"><strong>${escapeHtml(order.buyer.name)}</strong></p>
         <p style="margin:0;"><a href="tel:${escapeHtml(order.buyer.phone)}" style="color:#141110;">${escapeHtml(order.buyer.phone)}</a></p>
+        ${order.buyer.email ? `<p style="margin:6px 0 0;">${escapeHtml(order.buyer.email)}</p>` : ""}
+        <p style="margin:12px 0 0;color:#6d6460;">${escapeHtml(order.shippingLabel)}</p>
+        ${
+          order.buyer.address
+            ? `<p style="margin:6px 0 0;">${escapeHtml(`${order.buyer.address}, ${order.buyer.postal} ${order.buyer.city}`)}</p>`
+            : ""
+        }
         ${note}
       </div>
       <table style="width:100%;border-collapse:collapse;">${items}</table>

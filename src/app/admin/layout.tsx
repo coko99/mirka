@@ -14,11 +14,11 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   const authed = await isAdminSession();
 
   return (
-    <div className="min-h-full bg-cream text-ink">
+    <div className="min-h-full bg-[#efe8df] text-ink">
       {authed ? (
-        <div className="md:grid md:min-h-full md:grid-cols-[240px_1fr]">
+        <div className="md:grid md:min-h-dvh md:grid-cols-[240px_1fr]">
           <AdminNav />
-          <div className="px-5 py-8 md:px-10 md:py-10">{children}</div>
+          <div className="min-w-0 px-4 py-6 md:px-8 md:py-8">{children}</div>
         </div>
       ) : (
         children

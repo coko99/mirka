@@ -8,7 +8,8 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { getProduct, priceValue, type Product } from "@/lib/products";
+import { useCatalog } from "@/components/CatalogProvider";
+import { priceValue, type Product } from "@/lib/products";
 
 export type CartLine = {
   slug: string;
@@ -30,6 +31,7 @@ const CartContext = createContext<CartContextValue | null>(null);
 const STORAGE_KEY = "mirka-cart";
 
 export function CartProvider({ children }: { children: ReactNode }) {
+  const catalog = useCatalog();
   const [lines, setLines] = useState<CartLine[]>([]);
   const [ready, setReady] = useState(false);
 
@@ -51,7 +53,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const value = useMemo<CartContextValue>(() => {
     const items = lines
       .map((line) => {
-        const product = getProduct(line.slug);
+        const product = catalog.find((item) => item.slug === line.slug);
         if (!product) return null;
         const total = priceValue(product.price) * line.qty;
         return { product, qty: line.qty, total };
@@ -90,7 +92,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         setLines([]);
       },
     };
-  }, [lines]);
+  }, [catalog, lines]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

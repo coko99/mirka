@@ -2,20 +2,34 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useI18n } from "@/components/LocaleProvider";
 import { placeShopOrder } from "@/app/admin/actions";
+import { useI18n } from "@/components/LocaleProvider";
 import { useCart } from "@/lib/cart";
 import { formatRsd, productName } from "@/lib/products";
+import { CHECKOUT_METHODS, type CheckoutMethod } from "@/lib/shipping";
 import { site, whatsappHref } from "@/lib/site";
 
+const emptyBuyer = {
+  name: "",
+  email: "",
+  phone: "",
+  city: "",
+  address: "",
+  postal: "",
+  note: "",
+};
+
 export function CartView() {
+  const router = useRouter();
   const { items, total, setQty, remove, clear } = useCart();
   const { locale, dict, href } = useI18n();
-  const [buyer, setBuyer] = useState({ name: "", phone: "", note: "" });
-  const [done, setDone] = useState(false);
+  const [buyer, setBuyer] = useState(emptyBuyer);
+  const [delivery, setDelivery] = useState<CheckoutMethod>("courier");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const courier = delivery === "courier";
 
   if (items.length === 0) {
     return (
@@ -31,7 +45,11 @@ export function CartView() {
   const orderText = [
     dict.cart.orderTitle,
     `${dict.cart.orderName}: ${buyer.name || "-"}`,
+    `${dict.cart.email}: ${buyer.email || "-"}`,
     `${dict.cart.orderPhone}: ${buyer.phone || "-"}`,
+    courier
+      ? `${dict.cart.address}: ${buyer.address}, ${buyer.postal} ${buyer.city}`
+      : dict.cart.pickupKrusevac,
     "",
     ...items.map(
       (item) =>
@@ -43,6 +61,26 @@ export function CartView() {
   ]
     .filter(Boolean)
     .join("\n");
+
+  function field<K extends keyof typeof emptyBuyer>(key: K, placeholder: string) {
+    return (
+      <input
+        required={
+          key === "name" ||
+          key === "email" ||
+          key === "phone" ||
+          (courier && (key === "city" || key === "address"))
+        }
+        type={key === "email" ? "email" : "text"}
+        placeholder={placeholder}
+        value={buyer[key]}
+        onChange={(event) =>
+          setBuyer((current) => ({ ...current, [key]: event.target.value }))
+        }
+        className="w-full border border-ink/10 bg-white px-4 py-3 outline-none focus:border-ink"
+      />
+    );
+  }
 
   return (
     <div className="grid gap-10 md:grid-cols-5">
@@ -99,6 +137,9 @@ export function CartView() {
       </div>
 
       <aside className="border border-ink/10 bg-paper p-6 md:col-span-2">
+        <p className="text-[11px] tracking-[0.18em] text-muted uppercase">
+          {dict.cart.subtotal}
+        </p>
         <p className="font-serif text-3xl">{formatRsd(total)}</p>
         <p className="mt-1 text-sm text-ink/55">{dict.cart.payNote}</p>
 
@@ -109,16 +150,16 @@ export function CartView() {
             setError("");
             setSaving(true);
             try {
-              await placeShopOrder({
-                name: buyer.name,
-                phone: buyer.phone,
-                note: buyer.note,
+              const order = await placeShopOrder({
+                ...buyer,
+                delivery,
                 items: items.map((item) => ({
                   slug: item.product.slug,
                   qty: item.qty,
                 })),
               });
-              setDone(true);
+              clear();
+              router.push(href(`/porudzbina/${order.id}`));
             } catch (err) {
               setError(
                 err instanceof Error
@@ -130,24 +171,51 @@ export function CartView() {
             }
           }}
         >
-          <input
-            required
-            placeholder={dict.cart.name}
-            value={buyer.name}
-            onChange={(event) =>
-              setBuyer((current) => ({ ...current, name: event.target.value }))
-            }
-            className="w-full border border-ink/10 bg-white px-4 py-3 outline-none focus:border-ink"
-          />
-          <input
-            required
-            placeholder={dict.cart.phone}
-            value={buyer.phone}
-            onChange={(event) =>
-              setBuyer((current) => ({ ...current, phone: event.target.value }))
-            }
-            className="w-full border border-ink/10 bg-white px-4 py-3 outline-none focus:border-ink"
-          />
+          {field("name", dict.cart.name)}
+          {field("email", dict.cart.email)}
+          {field("phone", dict.cart.phone)}
+
+          <p className="pt-2 text-[11px] tracking-[0.16em] text-muted uppercase">
+            {dict.cart.deliveryTitle}
+          </p>
+          <div className="space-y-2">
+            {CHECKOUT_METHODS.map((method) => (
+              <label
+                key={method}
+                className={`flex cursor-pointer gap-3 border px-3 py-3 text-sm ${
+                  delivery === method
+                    ? "border-ink bg-white"
+                    : "border-ink/10 bg-white/60"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="delivery"
+                  checked={delivery === method}
+                  onChange={() => setDelivery(method)}
+                  className="mt-1"
+                />
+                <span>
+                  {method === "pickup_krusevac"
+                    ? dict.cart.pickupKrusevac
+                    : dict.cart.courier}
+                  {method === "courier" ? (
+                    <span className="mt-1 block text-xs text-ink/55">
+                      {dict.cart.courierHint}
+                    </span>
+                  ) : null}
+                </span>
+              </label>
+            ))}
+          </div>
+          {courier ? (
+            <>
+              {field("city", dict.cart.city)}
+              {field("address", dict.cart.address)}
+              {field("postal", dict.cart.postal)}
+            </>
+          ) : null}
+
           <textarea
             placeholder={dict.cart.note}
             value={buyer.note}
@@ -158,15 +226,16 @@ export function CartView() {
             rows={3}
           />
 
+          <div className="border-t border-ink/10 pt-4 text-sm">
+            <p className="flex justify-between font-medium">
+              <span>{dict.cart.orderTotal}</span>
+              <span className="tabular-nums">{formatRsd(total)}</span>
+            </p>
+          </div>
+
           {error ? (
             <p className="border border-rose/30 bg-blush/40 px-3 py-2 text-sm">
               {error}
-            </p>
-          ) : null}
-
-          {done ? (
-            <p className="border border-ink/10 bg-cream px-3 py-2 text-sm">
-              {dict.cart.ready}
             </p>
           ) : null}
 

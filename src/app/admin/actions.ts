@@ -10,11 +10,13 @@ import {
   setAdminSession,
 } from "@/lib/admin-auth";
 import {
+  deleteProduct,
   formatPriceInput,
+  insertProduct,
   readRawCatalog,
   saveUploadedImage,
   uniqueSlug,
-  writeRawCatalog,
+  updateProduct,
 } from "@/lib/catalog";
 import { createMessage, deleteMessage, markMessageRead } from "@/lib/messages";
 import { sendOrderEmail } from "@/lib/email";
@@ -24,6 +26,7 @@ import {
   markOrderEmailResult,
   ORDER_STATUSES,
   updateOrderStatus,
+  type CreateOrderInput,
   type OrderStatus,
 } from "@/lib/orders";
 import type { Category, RawProduct } from "@/lib/products";
@@ -88,8 +91,11 @@ async function productFromForm(formData: FormData, current?: RawProduct) {
 
   const image = formData.get("image");
   let imageFile = current?.imageFile || "";
+  let imagePath = current?.image || "";
   if (image instanceof File && image.size > 0) {
-    imageFile = await saveUploadedImage(image);
+    const uploaded = await saveUploadedImage(image);
+    imageFile = uploaded.imageFile;
+    imagePath = uploaded.image;
   }
   if (!imageFile) {
     throw new Error("Dodajte fotografiju proizvoda.");
@@ -106,7 +112,7 @@ async function productFromForm(formData: FormData, current?: RawProduct) {
     imageFile,
     sourceImage: current?.sourceImage || "",
     sourceUrl: current?.sourceUrl || "",
-    image: `/products/${imageFile}`,
+    image: imagePath || `/products/${imageFile}`,
     hidden,
     featured,
   };
@@ -116,8 +122,7 @@ async function productFromForm(formData: FormData, current?: RawProduct) {
 export async function createAdminProduct(formData: FormData) {
   await requireAdmin();
   const { next } = await productFromForm(formData);
-  const catalog = await readRawCatalog();
-  await writeRawCatalog([next, ...catalog]);
+  await insertProduct(next);
   revalidateShop();
   redirect(`/admin/proizvodi/${next.slug}`);
 }
@@ -131,9 +136,7 @@ export async function updateAdminProduct(formData: FormData) {
     throw new Error("Proizvod nije pronađen.");
   }
   const { next, previousSlug } = await productFromForm(formData, current);
-  await writeRawCatalog(
-    catalog.map((item) => (item.slug === previousSlug ? next : item)),
-  );
+  await updateProduct(previousSlug ?? current.slug, next);
   revalidateShop();
   redirect(`/admin/proizvodi/${next.slug}`);
 }
@@ -141,8 +144,7 @@ export async function updateAdminProduct(formData: FormData) {
 export async function deleteAdminProduct(formData: FormData) {
   await requireAdmin();
   const slug = String(formData.get("slug") || "");
-  const catalog = await readRawCatalog();
-  await writeRawCatalog(catalog.filter((item) => item.slug !== slug));
+  await deleteProduct(slug);
   revalidateShop();
   redirect("/admin/proizvodi");
 }
@@ -188,12 +190,7 @@ async function deliverOrderEmail(orderId: string) {
   }
 }
 
-export async function placeShopOrder(input: {
-  name: string;
-  phone: string;
-  note: string;
-  items: { slug: string; qty: number }[];
-}) {
+export async function placeShopOrder(input: CreateOrderInput) {
   const order = await createOrder(input);
   await deliverOrderEmail(order.id);
   revalidatePath("/admin");

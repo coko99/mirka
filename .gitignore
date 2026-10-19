@@ -6,5 +6,9 @@ out
 .env
 .env.local
 .env*.local
+.env*
+!.env.example
 *.tmp
 tsconfig.tsbuildinfo
+.vercel
+src/data/site-views.json

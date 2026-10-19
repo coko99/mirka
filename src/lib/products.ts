@@ -294,14 +294,17 @@ export const adminCategories: { id: Category; label: string }[] = [
   { id: "ostalo", label: "Ostalo" },
 ];
 
+export function featuredFrom(list: Product[]) {
+  const flagged = list.filter((product) => product.featured);
+  if (flagged.length > 0) return flagged;
+  return featuredSlugs
+    .map((slug) => list.find((product) => product.slug === slug))
+    .filter((product): product is Product => Boolean(product));
+}
+
 const flaggedFeatured = products.filter((product) => product.featured);
 
-export const featuredProducts =
-  flaggedFeatured.length > 0
-    ? flaggedFeatured
-    : featuredSlugs
-        .map((slug) => products.find((product) => product.slug === slug))
-        .filter((product): product is Product => Boolean(product));
+export const featuredProducts = featuredFrom(products);
 
 export function inPriceRange(product: Product, price: PriceId | "sve") {
   if (price === "sve") return true;
@@ -315,8 +318,9 @@ export function filterProducts(
   category: Category | "sve",
   color: ColorId | "sve" = "sve",
   price: PriceId | "sve" = "sve",
+  list: Product[] = products,
 ) {
-  return products.filter((product) => {
+  return list.filter((product) => {
     const byCategory = category === "sve" || product.category === category;
     const byColor = color === "sve" || product.colors.includes(color);
     return byCategory && byColor && inPriceRange(product, price);

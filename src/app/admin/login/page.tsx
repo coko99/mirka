@@ -7,7 +7,7 @@ export default async function AdminLoginPage() {
 
   return (
     <main className="grid min-h-full place-items-center px-5 py-16">
-      <div className="w-full max-w-md border border-ink/10 bg-paper p-8 md:p-10">
+      <div className="w-full max-w-md rounded-3xl border border-ink/10 bg-paper p-8 shadow-[0_24px_60px_-32px_rgba(20,17,16,0.5)] md:p-10">
         <p className="text-[11px] tracking-[0.28em] text-muted uppercase">
           MIRKA with love
         </p>
