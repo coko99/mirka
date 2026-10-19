@@ -1,0 +1,135 @@
+[
+  {
+    "id": "MWL-20261019-005",
+    "createdAt": "2026-10-19T20:47:45.262Z",
+    "status": "nova",
+    "buyer": {
+      "name": "test",
+      "phone": "00000141241412",
+      "note": "123123"
+    },
+    "items": [
+      {
+        "slug": "letnja-heklana-torba-sa-ruckom-u-obliku-ribe-letnja-pletena-torba-plave-boje-sa-resama-od-rafije",
+        "name": "Plava torba sa resama",
+        "qty": 1,
+        "price": "14.500",
+        "priceLabel": "14.500 RSD"
+      },
+      {
+        "slug": "clutch-torba-od-rafije-letnja-clutch-torba-letnja-tasna-rafija-torba-handmade-clutch-torba-1",
+        "name": "Clutch torba od rafije",
+        "qty": 1,
+        "price": "13.700",
+        "priceLabel": "13.700 RSD"
+      }
+    ],
+    "total": 28200,
+    "totalLabel": "28.200 RSD"
+  },
+  {
+    "id": "MWL-20261019-004",
+    "createdAt": "2026-10-19T20:47:44.692Z",
+    "status": "nova",
+    "buyer": {
+      "name": "test",
+      "phone": "00000141241412",
+      "note": "123123"
+    },
+    "items": [
+      {
+        "slug": "letnja-heklana-torba-sa-ruckom-u-obliku-ribe-letnja-pletena-torba-plave-boje-sa-resama-od-rafije",
+        "name": "Plava torba sa resama",
+        "qty": 1,
+        "price": "14.500",
+        "priceLabel": "14.500 RSD"
+      },
+      {
+        "slug": "clutch-torba-od-rafije-letnja-clutch-torba-letnja-tasna-rafija-torba-handmade-clutch-torba-1",
+        "name": "Clutch torba od rafije",
+        "qty": 1,
+        "price": "13.700",
+        "priceLabel": "13.700 RSD"
+      }
+    ],
+    "total": 28200,
+    "totalLabel": "28.200 RSD"
+  },
+  {
+    "id": "MWL-20261019-003",
+    "createdAt": "2026-10-19T20:47:36.395Z",
+    "status": "nova",
+    "buyer": {
+      "name": "test",
+      "phone": "00000141241412",
+      "note": "123123"
+    },
+    "items": [
+      {
+        "slug": "letnja-heklana-torba-sa-ruckom-u-obliku-ribe-letnja-pletena-torba-plave-boje-sa-resama-od-rafije",
+        "name": "Plava torba sa resama",
+        "qty": 1,
+        "price": "14.500",
+        "priceLabel": "14.500 RSD"
+      },
+      {
+        "slug": "clutch-torba-od-rafije-letnja-clutch-torba-letnja-tasna-rafija-torba-handmade-clutch-torba-1",
+        "name": "Clutch torba od rafije",
+        "qty": 1,
+        "price": "13.700",
+        "priceLabel": "13.700 RSD"
+      }
+    ],
+    "total": 28200,
+    "totalLabel": "28.200 RSD"
+  },
+  {
+    "id": "MWL-20261019-002",
+    "createdAt": "2026-10-19T20:47:32.955Z",
+    "status": "nova",
+    "buyer": {
+      "name": "test",
+      "phone": "00000141241412",
+      "note": "123123"
+    },
+    "items": [
+      {
+        "slug": "letnja-heklana-torba-sa-ruckom-u-obliku-ribe-letnja-pletena-torba-plave-boje-sa-resama-od-rafije",
+        "name": "Plava torba sa resama",
+        "qty": 1,
+        "price": "14.500",
+        "priceLabel": "14.500 RSD"
+      },
+      {
+        "slug": "clutch-torba-od-rafije-letnja-clutch-torba-letnja-tasna-rafija-torba-handmade-clutch-torba-1",
+        "name": "Clutch torba od rafije",
+        "qty": 1,
+        "price": "13.700",
+        "priceLabel": "13.700 RSD"
+      }
+    ],
+    "total": 28200,
+    "totalLabel": "28.200 RSD"
+  },
+  {
+    "id": "MWL-20261019-001",
+    "createdAt": "2026-10-19T20:44:34.314Z",
+    "status": "u_pripremi",
+    "buyer": {
+      "name": "Test Mira",
+      "phone": "0611981332",
+      "note": ""
+    },
+    "items": [
+      {
+        "slug": "unikat-prolecni-kardigan-u-3-boje-kardigan-od-mohera-sareni-kardigan-za-prolece",
+        "name": "UNIKAT prolećni kardigan",
+        "qty": 1,
+        "price": "15.000",
+        "priceLabel": "15.000 RSD"
+      }
+    ],
+    "total": 15000,
+    "totalLabel": "15.000 RSD"
+  }
+]
